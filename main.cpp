@@ -1,40 +1,43 @@
 #include <iostream>
+#include <vector>
 #include "checkers_board.hpp"
 #include "checkers_node.hpp"
 #include "checkers_move.hpp"
 
+void free_moves(std::vector<CheckersSequence*>& moves) {
+  for (auto move : moves) {
+    delete move;
+  }
+}
+
 int main() {
   std::cout << "Checkers" << std::endl;
   CheckersBoard* checkers_board = new CheckersBoard(10);
-
-  for (int i = 0; i < 10; i++) {
-    for (int j = 0; j < 10; j++) {
-      checkers_board->play(i, j, 0);
-    }
-  }
-
-  checkers_board->play(4, 4, 2);
-  checkers_board->play(2, 4, 2);
-  checkers_board->play(2, 6, 2);
-  checkers_board->play(5, 3, 1);
   checkers_board->print();
 
-  std::vector<CheckersSequence*> sequences = checkers_board->get_sequences(5, 3);
+  int player = 2;
+  for (int i = 0; i < 20; i++) {
+    player = (player == 2) ? 1 : 2;
+    std::cout << "Player " << player << " to play" << std::endl;
+    auto moves = checkers_board->get_moves(player);
 
-  std::cout << "found " << sequences.size() << std::endl;
-
-  for (auto sequence : sequences) {
-    const std::vector<CheckersMove*>& moves = sequence->get_moves();
-    std::cout << "size " << moves.size() << std::endl;
-
-    for (auto move : moves) {
-      move->print();
+    if (moves.size() > 0) {
+      for (int i = 0; i < moves.size(); i++) {
+        std::cout << i << ")";
+        moves[i]->print();
+      }
     }
 
-    std::cout << "---------------" << std::endl;
+    int choice;
+    std::cin >> choice;
+    for (auto move : moves[choice]->get_moves()) {
+      checkers_board->apply(move);
+    }
+    checkers_board->print();
+    free_moves(moves);
   }
 
-  checkers_board->print();
+
   delete checkers_board;
   return 0;
 }

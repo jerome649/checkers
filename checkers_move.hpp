@@ -25,6 +25,7 @@ public:
   ~CheckersSequence();
   void add(CheckersMove* move);
   std::vector<CheckersMove*> get_moves();
+  void print();
 private:
   std::vector<CheckersMove*> moves;
 };

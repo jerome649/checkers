@@ -79,6 +79,5 @@ std::vector<CheckersMove*> CheckersNode::vanilla_moves() {
       }
     }
   }
-
   return v;
 }
