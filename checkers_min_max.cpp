@@ -1,4 +1,6 @@
 #include "checkers_min_max.hpp"
+#include <chrono>
+#include <iostream>
 
 MinMaxNode::MinMaxNode(int max_depth, int depth, CheckersBoard* board, int player, bool is_min, CheckersSequence* move) {
   this->max_depth = max_depth;
@@ -71,9 +73,16 @@ CheckersMinMax::~CheckersMinMax() {
 }
 
 CheckersSequence* CheckersMinMax::min_max_move(int player) {
+  auto start = std::chrono::system_clock::now();
+
   auto root = new MinMaxNode(max_depth, 0, board, player, false, NULL);
   root->compute_value();
   CheckersSequence* res = root->get_best_child()->get_move()->copy();
   delete root;
+
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end-start;
+  std::cout << "min max took: " << elapsed_seconds.count() << " seconds" << std::endl;
+
   return res;
 }

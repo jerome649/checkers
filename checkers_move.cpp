@@ -1,13 +1,17 @@
 #include <iostream>
 #include "checkers_move.hpp"
 
+int CheckersMove::counter = 0;
+int CheckersSequence::counter = 0;
+int Tree::counter = 0;
+
 CheckersMove::CheckersMove(CheckersNode* from, CheckersNode* to, CheckersNode* eat)
   : from(from), to(to), eat(eat) {
-
+  CheckersMove::counter = CheckersMove::counter + 1;
 }
 
 CheckersMove::~CheckersMove() {
-
+  CheckersMove::counter = CheckersMove::counter - 1;
 }
 
 CheckersMove* CheckersMove::copy() {
@@ -26,6 +30,10 @@ CheckersNode* CheckersMove::get_eat() {
   return this->eat;
 }
 
+bool CheckersMove::is_equal(CheckersMove* move) {
+  return this->from == move->from && this->to == move->to && this->eat == move->eat;
+}
+
 void CheckersMove::print() {
   std::cout << from->get_i() << "/" << from->get_j() << " -> ";
   if (eat != NULL) {
@@ -35,10 +43,11 @@ void CheckersMove::print() {
 }
 
 CheckersSequence::CheckersSequence() {
-
+  CheckersSequence::counter = CheckersSequence::counter + 1;
 }
 
 CheckersSequence::~CheckersSequence() {
+  CheckersSequence::counter = CheckersSequence::counter - 1;
   for (auto move : this->moves) {
     delete move;
   }
@@ -48,6 +57,28 @@ void CheckersSequence::add(CheckersMove* move) {
   this->moves.push_back(move);
 }
 
+CheckersSequence* CheckersSequence::copy() {
+  CheckersSequence* copy = new CheckersSequence();
+  for (auto move : this->moves) {
+    copy->add(move->copy());
+  }
+  return copy;
+}
+
+bool CheckersSequence::is_equal(CheckersSequence* sequence) {
+  if (sequence->moves.size() != this->moves.size()) {
+    return false;
+  }
+  int i = 0;
+  bool equal = true;
+  int size = this->moves.size();
+  while (i < size && equal) {
+    equal = equal && this->moves[i]->is_equal(sequence->moves[i]);
+    i = i + 1;
+  }
+  return equal;
+}
+
 std::vector<CheckersMove*> CheckersSequence::get_moves() {
   return this->moves;
 }
@@ -55,17 +86,20 @@ std::vector<CheckersMove*> CheckersSequence::get_moves() {
 void CheckersSequence::print() {
   for (auto move : moves) {
     move->print();
+    std::cout << " ";
   }
   std::cout << std::endl;
 }
 
 Tree::Tree(Tree* parent, CheckersMove* move) {
+  Tree::counter = Tree::counter + 1;
   this->visited = false;
   this->move = move;
   this->parent = parent;
 }
 
 Tree::~Tree() {
+  Tree::counter = Tree::counter - 1;
   delete this->move;
   for (auto child : this->children) {
     delete child;
@@ -80,7 +114,7 @@ CheckersSequence* Tree::build() {
   std::vector<CheckersMove*> r;
   Tree* current = this;
   while (current->move != NULL) {
-    r.push_back(current->move);
+    r.push_back(current->move->copy());
     current = current->parent;
   }
   CheckersSequence* sequence = new CheckersSequence();
