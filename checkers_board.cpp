@@ -76,23 +76,39 @@ bool CheckersBoard::in_board(int i, int j) {
 }
 
 std::vector<CheckersSequence*> CheckersBoard::get_moves(int player) {
-  std::vector<CheckersSequence*> res;
+  std::vector<CheckersSequence*> res_eat;
+  std::vector<CheckersSequence*> res_no_eat;
 
   for (int i = 0; i < this->size; i++) {
     for (int j = 0; j < this->size; j++) {
       if (this->nodes[i][j]->get_player() == player) {
-        auto moves = this->get_sequences(i, j);
+        bool eat;
+        auto moves = this->get_sequences(i, j, eat);
         for (auto move : moves) {
-          res.push_back(move);
+          if (eat) {
+            res_eat.push_back(move);
+          } else {
+            res_no_eat.push_back(move);
+          }
         }
       }
     }
   }
 
-  return res;
+  if (res_eat.size() > 0) {
+    for (auto move : res_no_eat) {
+      delete move;
+    }
+    return res_eat;
+  } else {
+    for (auto move : res_eat) {
+      delete move;
+    }
+    return res_no_eat;
+  }
 }
 
-std::vector<CheckersSequence*> CheckersBoard::get_sequences(int i, int j) {
+std::vector<CheckersSequence*> CheckersBoard::get_sequences(int i, int j, bool& eat) {
   std::vector<CheckersSequence*> res;
 
   std::vector<CheckersMove*> moves = this->nodes[i][j]->eatable_moves();
@@ -105,10 +121,11 @@ std::vector<CheckersSequence*> CheckersBoard::get_sequences(int i, int j) {
       sequence->add(vanilla);
       res.push_back(sequence);
     }
+    eat = false;
     return res;
   }
-
-  Tree* tree = new Tree(NULL, NULL);
+  Tree* root = new Tree(NULL, NULL);
+  Tree* tree = root;
   for (auto move : moves) {
     tree->add_child(new Tree(tree, move));
   }
@@ -145,8 +162,8 @@ std::vector<CheckersSequence*> CheckersBoard::get_sequences(int i, int j) {
     }
   }
 
-  delete tree;
-
+  delete root;
+  eat = true;
   return res;
 }
 
@@ -177,7 +194,7 @@ void CheckersBoard::apply(CheckersMove* move) {
     this->nodes[move->get_eat()->get_i()][move->get_eat()->get_j()]
       ->set_player(0);
   }
-  
+
   this->nodes[move->get_to()->get_i()][move->get_to()->get_j()]
     ->set_player(move->get_from()->get_player());
 
@@ -199,6 +216,19 @@ void CheckersBoard::de_apply(CheckersMove* move) {
 
   this->nodes[move->get_to()->get_i()][move->get_to()->get_j()]
     ->set_player(0);
+}
+
+void CheckersBoard::apply(CheckersSequence* moves) {
+  for (auto move : moves->get_moves()) {
+    this->apply(move);
+  }
+}
+
+void CheckersBoard::de_apply(CheckersSequence* moves) {
+  std::vector<CheckersMove*> sequences = moves->get_moves();
+  for (int i = 0; i < sequences.size(); i++) {
+    this->de_apply(sequences[sequences.size() - 1 - i]);
+  }
 }
 
 void CheckersBoard::print() {

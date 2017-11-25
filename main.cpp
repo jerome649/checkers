@@ -3,6 +3,7 @@
 #include "checkers_board.hpp"
 #include "checkers_node.hpp"
 #include "checkers_move.hpp"
+#include "checkers_min_max.hpp"
 
 void free_moves(std::vector<CheckersSequence*>& moves) {
   for (auto move : moves) {
@@ -30,13 +31,13 @@ int main() {
 
     int choice;
     std::cin >> choice;
-    for (auto move : moves[choice]->get_moves()) {
-      checkers_board->apply(move);
-    }
+    checkers_board->apply(moves[choice]);
     checkers_board->print();
     free_moves(moves);
+    std::cout << "CheckersMove::counter=" << CheckersMove::counter << std::endl;
+    std::cout << "CheckersSequence::counter=" << CheckersSequence::counter << std::endl;
+    std::cout << "Tree::counter=" << Tree::counter << std::endl;
   }
-
 
   delete checkers_board;
   return 0;
