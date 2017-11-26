@@ -1,3 +1,6 @@
+#ifndef CHECKERS_MIN_MAX_H_
+#define CHECKERS_MIN_MAX_H_
+
 #include "checkers_move.hpp"
 #include "checkers_board.hpp"
 #include <vector>
@@ -31,3 +34,5 @@ private:
   int max_depth;
   CheckersBoard* board;
 };
+
+#endif

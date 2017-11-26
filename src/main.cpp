@@ -19,7 +19,7 @@ int main() {
   CheckersMinMax* min_max = new CheckersMinMax(6, checkers_board);
 
   int player = 2;
-  for (int i = 0; i < 40; i++) {
+  for (int i = 0; i < 60; i++) {
     player = (player == 2) ? 1 : 2;
     std::cout << "Player " << player << " to play" << std::endl;
     auto moves = checkers_board->get_moves(player);
