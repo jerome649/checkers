@@ -118,5 +118,24 @@ TEST_CASE("check available moves", "[moves]") {
     REQUIRE(moves0[0]->get_to()->get_j() == 9);
   }
 
+  SECTION("player 2 can eat in reverse") {
+    checkers_board.play(6, 7, 0);
+    checkers_board.play(7, 8, 1);
+    checkers_board.play(8, 9, 2);
+    std::vector<CheckersSequence*> sequences = checkers_board.get_moves(2);
+
+    REQUIRE(sequences.size() == 1);
+
+    std::vector<CheckersMove*> moves0 = sequences[0]->get_moves();
+
+    REQUIRE(moves0.size() == 1);
+    REQUIRE(moves0[0]->get_eat()->get_i() == 7);
+    REQUIRE(moves0[0]->get_eat()->get_j() == 8);
+    REQUIRE(moves0[0]->get_from()->get_i() == 8);
+    REQUIRE(moves0[0]->get_from()->get_j() == 9);
+    REQUIRE(moves0[0]->get_to()->get_i() == 6);
+    REQUIRE(moves0[0]->get_to()->get_j() == 7);
+  }
+
 
 }

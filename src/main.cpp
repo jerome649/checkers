@@ -4,6 +4,8 @@
 #include "checkers_node.hpp"
 #include "checkers_move.hpp"
 #include "checkers_min_max.hpp"
+#include "zlib.h"
+
 
 void free_moves(std::vector<CheckersSequence*>& moves) {
   for (auto move : moves) {
